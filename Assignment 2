@@ -2,19 +2,30 @@
 #include <cstring>
 #include <sstream>
 #include <string.h>
+#include <math.h>
 #include <string>
 #include <vector>
 #include <iostream>
 
-using namespace std;
+int StandardDeviationFunc(std::vector<double> Grade, double Mean)
+    {
+    int NumValues = sizeof(Grade)/sizeof(Grade[0]);
+    int SumOfDifferences;
+    for (int i = 0; i < NumValues; i++) {
+        SumOfDifferences = Grade[i] - Mean;
+    }
+    return pow((pow(NumValues-1,-1) * pow(SumOfDifferences,2) ),0.5);
+    }
 
 int MeanFunc(std::vector<double> Grade, int NumEntries) {
-    int total;
+    double total;
     for (int i = 0; i < NumEntries; i++) {
         total = total + Grade[i];
     }
     return total/NumEntries;
 }
+
+using namespace std;
 
 int main() {
     std::vector<string> Data;
@@ -22,7 +33,8 @@ int main() {
     std::vector<int> CourseCode;
     std::vector<string> CourseName;
     int NumEntries;
-    int mean;
+    double Mean;
+    double StandardDeviation;
     string GradeString; string CourseCodeString; string CourseNameString;
     int i = 0;
     ifstream file("course_marks.txt");
@@ -40,13 +52,15 @@ int main() {
         }
         file.close();
     } else {
-                cerr<<"File could not be opened"<<endl;
-            }
+        cerr<<"File could not be opened"<<endl;
+    }
     NumEntries = Grade.size();
     for (int i = 0; i < NumEntries; i++) {
         cout << CourseName[i] << endl;
     }
-    mean = MeanFunc(Grade, NumEntries);
-    cout << mean << endl;
+    Mean = MeanFunc(Grade, NumEntries);
+    cout << Mean << endl;
+    StandardDeviation = StandardDeviationFunc(Grade, Mean);
+    cout << StandardDeviation << endl;
     return 0;
 }
