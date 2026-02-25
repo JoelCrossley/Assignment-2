@@ -1,0 +1,41 @@
+#include <fstream>
+#include <cstring>
+#include <sstream>
+#include <string.h>
+#include <string>
+#include <vector>
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    std::vector<string> Data;
+    std::vector<double> Grade;
+    std::vector<int> CourseCode;
+    std::vector<string> CourseName;
+    int NumEntries;
+    string GradeString; string CourseCodeString; string CourseNameString;
+    int i = 0;
+    ifstream file("course_marks.txt");
+    if (file.is_open()) {
+        string line;
+        while (getline(file, line)) { //Each line is extracted as a string and made into three copies. These copies are used to obtain the three data categories we want by removing the unneeded parts then converting to an element of a vector of the correct type
+            GradeString = line; CourseCodeString = line; CourseNameString = line;
+            GradeString.erase(GradeString.begin() + 4, GradeString.end());
+            Grade.push_back(stod(GradeString));
+            CourseCodeString.erase(CourseCodeString.begin(), CourseCodeString.begin() + 5);
+            CourseCodeString.erase(CourseCodeString.begin() + 5, CourseCodeString.end());
+            CourseCode.push_back(stoi(CourseCodeString));
+            CourseNameString.erase(CourseNameString.begin(), CourseNameString.begin() + 13);
+            CourseName.push_back(CourseNameString);
+        }
+        file.close();
+    } else {
+                cerr<<"File could not be opened"<<endl;
+            }
+    NumEntries = Grade.size();
+    for (int i = 0; i < NumEntries; i++) {
+        cout << CourseName[i] << endl;
+    }
+    return 0;
+}
