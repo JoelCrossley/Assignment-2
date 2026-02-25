@@ -7,6 +7,8 @@
 #include <vector>
 #include <iostream>
 
+using namespace std;
+
 int StandardDeviationFunc(std::vector<double> Grade, double Mean)
     {
     int NumValues = sizeof(Grade)/sizeof(Grade[0]);
@@ -25,16 +27,39 @@ int MeanFunc(std::vector<double> Grade, int NumEntries) {
     return total/NumEntries;
 }
 
-using namespace std;
+int YearFunc(std::vector<double> CourseCode, std::vector<double> Grade, std::vector<string> CourseName, int Year) {
+    cout<<"Here is the data for year "<<Year<<endl;
+    for (int i = 0; i < CourseCode.size(); i++) {
+        double num = CourseCode[i] / double(10000);
+        if ((num < Year) || (num > Year + 0.99999)) {
+            CourseCode.erase(CourseCode.begin()+i);
+            CourseName.erase(CourseName.begin()+i);
+            Grade.erase(Grade.begin()+i); i--;
+        }
+        }
+    for (int j = 0; j < CourseCode.size(); j++) {
+        cout<< Grade[j] << " " << CourseCode[j] << " " << CourseName[j] << endl;
+    }
+    double Mean = MeanFunc(Grade, sizeof(Grade));
+    double StandardDeviation = StandardDeviationFunc(Grade, Mean);
+    double StandardError = StandardDeviation/pow(sizeof(Grade),2);
+    cout << "The mean grade for year " << Year << " was " << Mean << "% " << endl;
+    cout << "The standard deviation was " << StandardDeviation << endl;
+    cout << "The standard error was " << StandardError << endl;
+    cout << "There are " << sizeof(Grade) << "enteries" << endl;
+    return 0;
+}
 
 int main() {
     std::vector<string> Data;
     std::vector<double> Grade;
-    std::vector<int> CourseCode;
+    std::vector<double> CourseCode;
     std::vector<string> CourseName;
     int NumEntries;
+    int Year;
     double Mean;
     double StandardDeviation;
+    double StandardError;
     string GradeString; string CourseCodeString; string CourseNameString;
     int i = 0;
     ifstream file("course_marks.txt");
@@ -46,7 +71,7 @@ int main() {
             Grade.push_back(stod(GradeString));
             CourseCodeString.erase(CourseCodeString.begin(), CourseCodeString.begin() + 5);
             CourseCodeString.erase(CourseCodeString.begin() + 5, CourseCodeString.end());
-            CourseCode.push_back(stoi(CourseCodeString));
+            CourseCode.push_back(stod(CourseCodeString));
             CourseNameString.erase(CourseNameString.begin(), CourseNameString.begin() + 13);
             CourseName.push_back(CourseNameString);
         }
@@ -56,11 +81,23 @@ int main() {
     }
     NumEntries = Grade.size();
     for (int i = 0; i < NumEntries; i++) {
-        cout << CourseName[i] << endl;
+        cout << CourseCode[i] <<CourseName[i] << endl;
     }
     Mean = MeanFunc(Grade, NumEntries);
-    cout << Mean << endl;
     StandardDeviation = StandardDeviationFunc(Grade, Mean);
-    cout << StandardDeviation << endl;
+    StandardError = StandardDeviation/pow(NumEntries,0.5);
+    cout << "The mean grade was " << Mean << "% " << endl;
+    cout << "The standard deviation was " << StandardDeviation << endl;
+    cout << "The standard error was " << StandardError << endl;
+    cout << "There are " << NumEntries << "enteries" << endl;
+    cout << "Would you like the data for a specific year group? Enter a number from 1-4 to select a specific year of 0 to terminate. " << endl;
+    while (!(cin>>Year)||Year>4) {
+        cout << "Invalid input, must be an integer from 0 to 4 ";
+        cin.clear();
+        cin.ignore();
+    }
+    //double num = CourseCode[1] / double(10000);
+    //cout << num << endl;
+    YearFunc(CourseCode, Grade, CourseName, Year);
     return 0;
 }
