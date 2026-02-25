@@ -8,12 +8,21 @@
 
 using namespace std;
 
+int MeanFunc(std::vector<double> Grade, int NumEntries) {
+    int total;
+    for (int i = 0; i < NumEntries; i++) {
+        total = total + Grade[i];
+    }
+    return total/NumEntries;
+}
+
 int main() {
     std::vector<string> Data;
     std::vector<double> Grade;
     std::vector<int> CourseCode;
     std::vector<string> CourseName;
     int NumEntries;
+    int mean;
     string GradeString; string CourseCodeString; string CourseNameString;
     int i = 0;
     ifstream file("course_marks.txt");
@@ -37,5 +46,7 @@ int main() {
     for (int i = 0; i < NumEntries; i++) {
         cout << CourseName[i] << endl;
     }
+    mean = MeanFunc(Grade, NumEntries);
+    cout << mean << endl;
     return 0;
 }
