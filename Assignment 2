@@ -1,4 +1,4 @@
-#include <fstream>
+include <fstream>
 #include <cstring>
 #include <sstream>
 #include <string.h>
@@ -67,7 +67,9 @@ int main() {
     double StandardDeviation;
     double StandardError;
     char Repeat = 'y';
-    string GradeString; string CourseCodeString; string CourseNameString;
+    string lowest;
+    string highest;
+    string GradeString; string CourseCodeString; string CourseNameString; //Declare temporary variables on one line
     int i = 0;
     ifstream file("course_marks.txt");
     if (file.is_open()) {
