@@ -2,6 +2,7 @@
 #include <cstring>
 #include <sstream>
 #include <string.h>
+#include<iomanip>
 #include <math.h>
 #include <string>
 #include <vector>
@@ -9,17 +10,20 @@
 
 using namespace std;
 
+
+//calculates the standard deviation
 int StandardDeviationFunc(std::vector<double> Grade, double Mean)
     {
-    int NumValues = sizeof(Grade)/sizeof(Grade[0]);
-    int SumOfDifferences;
+    double NumValues = Grade.size();
+    double SumOfDifferences;
     for (int i = 0; i < NumValues; i++) {
-        SumOfDifferences = Grade[i] - Mean;
+        SumOfDifferences = SumOfDifferences + pow(Grade[i] - Mean, 2);//sums the square of the difference between each value and the mean
     }
-    return pow((pow(NumValues-1,-1) * pow(SumOfDifferences,2) ),0.5);
+    return pow((pow(NumValues-1,-1) * SumOfDifferences ),0.5);
     }
 
-int MeanFunc(std::vector<double> Grade, int NumEntries) {
+//Calculates the mean
+int MeanFunc(std::vector<double> Grade, double NumEntries) {
     double total;
     for (int i = 0; i < NumEntries; i++) {
         total = total + Grade[i];
@@ -27,6 +31,7 @@ int MeanFunc(std::vector<double> Grade, int NumEntries) {
     return total/NumEntries;
 }
 
+//Function that outputs data and stats for a specific year, removes entries from previous years by comparing course code to the year selected (course codes starts with the year), then calls mean and standard deviation functions
 int YearFunc(std::vector<double> CourseCode, std::vector<double> Grade, std::vector<string> CourseName, int Year) {
     cout<<"Here is the data for year "<<Year<<endl;
     for (int i = 0; i < CourseCode.size(); i++) {
@@ -38,15 +43,16 @@ int YearFunc(std::vector<double> CourseCode, std::vector<double> Grade, std::vec
         }
         }
     for (int j = 0; j < CourseCode.size(); j++) {
-        cout<< Grade[j] << " " << CourseCode[j] << " " << CourseName[j] << endl;
+        cout << Grade[j] << " " << setprecision(5) << CourseCode[j] << " " << CourseName[j] << endl;//Outputs each row for the specified year, setprecision used to prevent output being in standard form
     }
-    double Mean = MeanFunc(Grade, sizeof(Grade));
+    double NumEntries = Grade.size();
+    double Mean = MeanFunc(Grade, NumEntries);
     double StandardDeviation = StandardDeviationFunc(Grade, Mean);
-    double StandardError = StandardDeviation/pow(sizeof(Grade),2);
+    double StandardError = StandardDeviation/pow(NumEntries,2);
     cout << "The mean grade for year " << Year << " was " << Mean << "% " << endl;
     cout << "The standard deviation was " << StandardDeviation << endl;
     cout << "The standard error was " << StandardError << endl;
-    cout << "There are " << sizeof(Grade) << "enteries" << endl;
+    cout << "There are " << NumEntries << " entries" << endl;
     return 0;
 }
 
@@ -55,11 +61,12 @@ int main() {
     std::vector<double> Grade;
     std::vector<double> CourseCode;
     std::vector<string> CourseName;
-    int NumEntries;
+    double NumEntries;
     int Year;
     double Mean;
     double StandardDeviation;
     double StandardError;
+    char Repeat = 'y';
     string GradeString; string CourseCodeString; string CourseNameString;
     int i = 0;
     ifstream file("course_marks.txt");
@@ -67,11 +74,11 @@ int main() {
         string line;
         while (getline(file, line)) { //Each line is extracted as a string and made into three copies. These copies are used to obtain the three data categories we want by removing the unneeded parts then converting to an element of a vector of the correct type
             GradeString = line; CourseCodeString = line; CourseNameString = line;
-            GradeString.erase(GradeString.begin() + 4, GradeString.end());
-            Grade.push_back(stod(GradeString));
+            GradeString.erase(GradeString.begin() + 4, GradeString.end());//Erases everything on the line apart from the grade, which is the first 4 characters
+            Grade.push_back(stod(GradeString));//'line' gives the data as a string, stod converts to double
             CourseCodeString.erase(CourseCodeString.begin(), CourseCodeString.begin() + 5);
             CourseCodeString.erase(CourseCodeString.begin() + 5, CourseCodeString.end());
-            CourseCode.push_back(stod(CourseCodeString));
+            CourseCode.push_back(stod(CourseCodeString));//'line' gives the data as a string, stod converts to double
             CourseNameString.erase(CourseNameString.begin(), CourseNameString.begin() + 13);
             CourseName.push_back(CourseNameString);
         }
@@ -81,23 +88,38 @@ int main() {
     }
     NumEntries = Grade.size();
     for (int i = 0; i < NumEntries; i++) {
-        cout << CourseCode[i] <<CourseName[i] << endl;
+        cout << Grade[i] << " " << CourseCode[i] << " " <<CourseName[i] << endl;
     }
     Mean = MeanFunc(Grade, NumEntries);
     StandardDeviation = StandardDeviationFunc(Grade, Mean);
     StandardError = StandardDeviation/pow(NumEntries,0.5);
-    cout << "The mean grade was " << Mean << "% " << endl;
+    cout << setprecision(4) << "The mean grade was " << Mean << "% " << endl;
     cout << "The standard deviation was " << StandardDeviation << endl;
     cout << "The standard error was " << StandardError << endl;
-    cout << "There are " << NumEntries << "enteries" << endl;
+    cout << "There are " << NumEntries << " entries" << endl;
     cout << "Would you like the data for a specific year group? Enter a number from 1-4 to select a specific year of 0 to terminate. " << endl;
     while (!(cin>>Year)||Year>4) {
         cout << "Invalid input, must be an integer from 0 to 4 ";
         cin.clear();
         cin.ignore();
     }
-    //double num = CourseCode[1] / double(10000);
-    //cout << num << endl;
-    YearFunc(CourseCode, Grade, CourseName, Year);
+    while ((Repeat == 'y') && (Year != 0)) {
+        YearFunc(CourseCode, Grade, CourseName, Year);
+        cout << "Would you like data for another year? Enter 'y' for yes of 'n' for no";
+        while (!(cin>>Repeat)) {
+            cout << "Invalid input, must be either 'y' or 'n'";
+            cin.clear();
+            cin.ignore();
+            cout<< Repeat <<endl;
+        }
+        if (Repeat == 'y') {
+            cout << "Which year would you like the data for? Enter a number from 1-4 to select a specific year of 0 to terminate. " << endl;
+            while (!(cin>>Year)||Year>4) {
+                cout << "Invalid input, must be an integer from 0 to 4 ";
+                cin.clear();
+                cin.ignore();
+            }
+        }
+    }
     return 0;
 }
